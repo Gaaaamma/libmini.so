@@ -231,7 +231,10 @@ void perror(const char *prefix) {
 	write(2, "\n", 1);
 	return;
 }
-
+unsigned int alarm(unsigned int seconds){
+	long ret = sys_alarm(seconds);
+	WRAPPER_RETval(unsigned int);
+}
 #if 0	/* we have an equivalent implementation in assembly */
 unsigned int sleep(unsigned int seconds) {
 	long ret;

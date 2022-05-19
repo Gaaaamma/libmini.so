@@ -51,8 +51,4 @@ clean:
 	rm -f alarm2
 	rm -f alarm3
 	rm -f jmp1
-
-test:
-	LD_LIBRARY_PATH=. ./write1
-	LD_LIBRARY_PATH=. ./alarm1
 	
