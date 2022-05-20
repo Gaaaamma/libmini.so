@@ -196,6 +196,8 @@ long sys_setgid(gid_t gid);
 long sys_geteuid();
 long sys_getegid();
 
+long sys_alarm(unsigned int seconds);
+
 /* wrappers */
 ssize_t	read(int fd, char *buf, size_t count);
 ssize_t	write(int fd, const void *buf, size_t count);
