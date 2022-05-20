@@ -8,6 +8,11 @@ typedef int mode_t;
 typedef int uid_t;
 typedef int gid_t;
 typedef int pid_t;
+typedef void (*sighandler_t)(int);
+#define SIGSIZE 64	/* sigset size */
+typedef struct {
+	unsigned long sig[SIGSIZE];
+}sigset_t;
 
 extern long errno;
 
@@ -128,6 +133,8 @@ extern long errno;
 #define SIGPROF		27
 #define SIGWINCH	28
 #define SIGIO		29
+#define SIGPWR		30
+#define SIGSYS		31
 #define SIGPOLL		SIGIO
 
 /* from /usr/include/x86_64-linux-gnu/bits/sigaction.h */
@@ -159,6 +166,14 @@ struct timeval {
 struct timezone {
 	int	tz_minuteswest;	/* minutes west of Greenwich */
 	int	tz_dsttime;	/* type of DST correction */
+};
+
+struct sigaction{
+	void (*sa_handler)(int);
+	// void (*sa_sigaction)(int, siginfo_t *, void *);
+	sigset_t sa_mask;
+	int sa_flags;
+	void (*sa_restorer)(void);
 };
 
 /* system calls */
@@ -238,6 +253,16 @@ size_t strlen(const char *s);
 void perror(const char *prefix);
 unsigned int sleep(unsigned int s);
 
+// HW
+//int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+int sigismember(const sigset_t *set, int sig);
+int sigaddset (sigset_t *set, int sig);
+int sigdelset (sigset_t *set, int sig);
+int sigemptyset(sigset_t *set);
+int sigfillset(sigset_t *set);
+//int sigpending(sigset_t *set);
+//int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+//sighandler_t signal(int signum, sighandler_t handler);
 unsigned int alarm(unsigned int seconds);
 
 #endif	/* __LIBMINI_H__ */

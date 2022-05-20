@@ -13,10 +13,15 @@ libmini.o: libmini.c
 	gcc -c -g -Wall -fno-stack-protector -fPIC -nostdlib libmini.c
 
 
-testcase: start.o write1 alarm1
+testcase: start.o write1 alarm1 test
 
 start.o: start.asm
 	yasm -f elf64 -DYASM -D__x86_64__ -DPIC start.asm -o start.o
+
+test: test.c
+	gcc -c -g -Wall -fno-stack-protector -nostdlib -I. -I.. -DUSEMINI test.c
+	ld -m elf_x86_64 --dynamic-linker /lib64/ld-linux-x86-64.so.2 -o test test.o start.o -L. -L.. -lmini
+	rm test.o
 
 write1: write1.c
 	gcc -c -g -Wall -fno-stack-protector -nostdlib -I. -I.. -DUSEMINI write1.c
@@ -51,4 +56,5 @@ clean:
 	rm -f alarm2
 	rm -f alarm3
 	rm -f jmp1
+	rm -f test
 	

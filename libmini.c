@@ -231,6 +231,78 @@ void perror(const char *prefix) {
 	write(2, "\n", 1);
 	return;
 }
+
+int sigismember(const sigset_t *set, int sig){
+	if(set->sig[sig] ==1){
+		return 1;
+	}else if(set->sig[sig] ==0){
+		return 0;
+	}else{
+		return -1;
+	}
+}
+int sigaddset (sigset_t *set, int sig){
+	if(sig < 1 || sig > 31){
+		return -1;
+	}else{
+		set->sig[sig] = 1;
+		return 0;
+	}
+}
+int sigdelset (sigset_t *set, int sig){
+	if(sig < 1 || sig > 31){
+		return -1;
+	}else{
+		set->sig[sig] = 0;
+		return 0;
+	}
+}
+int sigemptyset(sigset_t *set){
+	for(int i=0;i<SIGSIZE;i++){
+		set->sig[i] =0;
+	}
+	return 0;
+}
+int sigfillset(sigset_t *set){
+	for(int i=0;i<SIGSIZE;i++){
+		set->sig[i] =1;
+	}
+	return 0;
+}
+
+/*
+sighandler_t signal(int signum, sighandler_t handler){
+	struct sigaction act, oact;
+	act.sa_handler = handler;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags =0;
+	if(signum == SIGALRM){
+#ifdef SA_INTERRUPT
+		act.sa_flags |= SA_INTERRUPT;
+#endif
+	}else{
+#ifdef SA_RESTART
+		act.sa_flags |= SA_RESTART;
+#endif	
+	}
+
+	if(sigaction(signum, &act, &oact) < 0){
+		return(SIG_ERR);
+	}else{
+		return(oact.sa_handler);
+	}
+}
+*/
+
+/*
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact){
+	// ...
+	act->sa_flags |= SA_RESTORER;
+	act->sa_restorer = ; //your customized restore routine, e.g., __myrt 
+	ret = sys_rt_sigaction(signum, act, oldact, sizeof(sigset_t));
+	// ...
+}
+*/
 unsigned int alarm(unsigned int seconds){
 	long ret = sys_alarm(seconds);
 	WRAPPER_RETval(unsigned int);
