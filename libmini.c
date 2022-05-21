@@ -233,6 +233,7 @@ void perror(const char *prefix) {
 }
 
 int sigismember(const sigset_t *set, int sig){
+	sig -=1; // sig need to shift one bit
 	unsigned long checker = (1<<sig);
 	if(set->sig[0] & checker){
 		return 1;
@@ -247,6 +248,7 @@ int sigaddset (sigset_t *set, int sig){
 		errno = EINVAL;
 		return -1;
 	}else{
+		sig -=1; // sig need to shift one bit
 		set->sig[0] |= (1 << sig);
 		return 0;
 	}
@@ -256,6 +258,7 @@ int sigdelset (sigset_t *set, int sig){
 		errno = EINVAL;
 		return -1;
 	}else{
+		sig -=1; // sig need to shift one bit
 		set->sig[0] &= ~(1 << sig);
 		return 0;
 	}
@@ -268,22 +271,16 @@ int sigfillset(sigset_t *set){
 	set->sig[0] |= 0xffffffffffffffff;
 	return 0;
 }
-/*
-int sigprocmask(int how, const sigset_t *set, sigset_t *oldset){
-	if(how == SIG_BLOCK){
-		// 
-	}else if(how == SIG_UNBLOCK){
-		// unset the mask with 'set'
-		
-	}else if(how == SIG_SETMASK){
-		// set it 'set' directly
 
-	}else{
-		// Not above
-		return -1;
-	}
+int sigpending(sigset_t *set){
+	return -1;
 }
-*/
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset){
+	sigset_t *nset = set;
+	long ret = sys_rt_sigprocmask(how,nset,oldset,8);
+	WRAPPER_RETval(int);
+}
+
 /*
 sighandler_t signal(int signum, sighandler_t handler){
 	struct sigaction act, oact;

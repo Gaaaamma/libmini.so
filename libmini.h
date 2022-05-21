@@ -106,11 +106,6 @@ extern long errno;
 #define	EDOM		33	/* Math argument out of domain of func */
 #define	ERANGE		34	/* Math result not representable */
 
-// sigprocmask-> how setting
-#define SIG_BLOCK 	 0
-#define SIG_UNBLOCK  1
-#define SIG_SETMASK  2
-
 /* from /usr/include/x86_64-linux-gnu/asm/signal.h */
 #define SIGHUP		 1
 #define SIGINT		 2
@@ -220,6 +215,9 @@ long sys_setgid(gid_t gid);
 long sys_geteuid();
 long sys_getegid();
 
+// HW
+long sys_rt_sigpending(sigset_t *set,size_t sigsetsize);
+long sys_rt_sigprocmask(int how,sigset_t *nset,sigset_t *oset,size_t sigsetsize);
 long sys_alarm(unsigned int seconds);
 
 /* wrappers */
@@ -269,9 +267,11 @@ int sigaddset (sigset_t *set, int sig);
 int sigdelset (sigset_t *set, int sig);
 int sigemptyset(sigset_t *set);
 int sigfillset(sigset_t *set);
-//int sigpending(sigset_t *set);
-//int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+int sigpending(sigset_t *set);
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 //sighandler_t signal(int signum, sighandler_t handler);
+//int setjmp(jmp_buf env);
+//void longjmp(jmp_buf env, int val);
 unsigned int alarm(unsigned int seconds);
 
 #endif	/* __LIBMINI_H__ */
