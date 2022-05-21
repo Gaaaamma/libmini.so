@@ -273,7 +273,8 @@ int sigfillset(sigset_t *set){
 }
 
 int sigpending(sigset_t *set){
-	return -1;
+	long ret = sys_rt_sigpending(set,8);
+	WRAPPER_RETval(int);
 }
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset){
 	sigset_t *nset = set;

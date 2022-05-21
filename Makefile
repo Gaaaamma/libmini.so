@@ -13,7 +13,7 @@ libmini.o: libmini.c
 	gcc -c -g -Wall -fno-stack-protector -fPIC -nostdlib libmini.c
 
 
-testcase: start.o write1 alarm1 test testorigin
+testcase: start.o write1 alarm1 alarm2 test testorigin
 
 start.o: start.asm
 	yasm -f elf64 -DYASM -D__x86_64__ -DPIC start.asm -o start.o
