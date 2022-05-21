@@ -233,9 +233,10 @@ void perror(const char *prefix) {
 }
 
 int sigismember(const sigset_t *set, int sig){
-	if(set->sig[sig] ==1){
+	unsigned long checker = (1<<sig);
+	if(set->sig[0] & checker){
 		return 1;
-	}else if(set->sig[sig] ==0){
+	}else if((set->sig[0] & checker)==0){
 		return 0;
 	}else{
 		return -1;
@@ -243,33 +244,46 @@ int sigismember(const sigset_t *set, int sig){
 }
 int sigaddset (sigset_t *set, int sig){
 	if(sig < 1 || sig > 31){
+		errno = EINVAL;
 		return -1;
 	}else{
-		set->sig[sig] = 1;
+		set->sig[0] |= (1 << sig);
 		return 0;
 	}
 }
 int sigdelset (sigset_t *set, int sig){
 	if(sig < 1 || sig > 31){
+		errno = EINVAL;
 		return -1;
 	}else{
-		set->sig[sig] = 0;
+		set->sig[0] &= ~(1 << sig);
 		return 0;
 	}
 }
 int sigemptyset(sigset_t *set){
-	for(int i=0;i<SIGSIZE;i++){
-		set->sig[i] =0;
-	}
+	set->sig[0] &= 0x0;
 	return 0;
 }
 int sigfillset(sigset_t *set){
-	for(int i=0;i<SIGSIZE;i++){
-		set->sig[i] =1;
-	}
+	set->sig[0] |= 0xffffffffffffffff;
 	return 0;
 }
+/*
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset){
+	if(how == SIG_BLOCK){
+		// 
+	}else if(how == SIG_UNBLOCK){
+		// unset the mask with 'set'
+		
+	}else if(how == SIG_SETMASK){
+		// set it 'set' directly
 
+	}else{
+		// Not above
+		return -1;
+	}
+}
+*/
 /*
 sighandler_t signal(int signum, sighandler_t handler){
 	struct sigaction act, oact;

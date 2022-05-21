@@ -9,9 +9,13 @@ typedef int uid_t;
 typedef int gid_t;
 typedef int pid_t;
 typedef void (*sighandler_t)(int);
+
+#define _NSIG		64
+#define _NSIG_BPW	64
+#define _NSIG_WORDS	(_NSIG / _NSIG_BPW)
 #define SIGSIZE 64	/* sigset size */
 typedef struct {
-	unsigned long sig[SIGSIZE];
+	unsigned long sig[_NSIG_WORDS];
 }sigset_t;
 
 extern long errno;
@@ -101,6 +105,11 @@ extern long errno;
 #define	EPIPE		32	/* Broken pipe */
 #define	EDOM		33	/* Math argument out of domain of func */
 #define	ERANGE		34	/* Math result not representable */
+
+// sigprocmask-> how setting
+#define SIG_BLOCK 	 0
+#define SIG_UNBLOCK  1
+#define SIG_SETMASK  2
 
 /* from /usr/include/x86_64-linux-gnu/asm/signal.h */
 #define SIGHUP		 1
