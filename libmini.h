@@ -8,12 +8,12 @@ typedef int mode_t;
 typedef int uid_t;
 typedef int gid_t;
 typedef int pid_t;
+typedef long int clock_t;
 typedef void (*sighandler_t)(int);
 
 #define _NSIG		64
 #define _NSIG_BPW	64
 #define _NSIG_WORDS	(_NSIG / _NSIG_BPW)
-#define SIGSIZE 64	/* sigset size */
 typedef struct {
 	unsigned long sig[_NSIG_WORDS];
 }sigset_t;
@@ -144,18 +144,21 @@ extern long errno;
 /* from /usr/include/x86_64-linux-gnu/bits/sigaction.h */
 #define	SA_NOCLDSTOP  1		 /* Don't send SIGCHLD when children stop.  */
 #define SA_NOCLDWAIT  2		 /* Don't create zombie on child death.  */
-#define SA_SIGINFO    4		 /* Invoke signal-catching function with
-				    three arguments instead of one.  */
-# define SA_ONSTACK   0x08000000 /* Use signal stack by using `sa_restorer'. */
-# define SA_RESTART   0x10000000 /* Restart syscall on signal return.  */
-# define SA_INTERRUPT 0x20000000 /* Historical no-op.  */
-# define SA_NODEFER   0x40000000 /* Don't automatically block the signal when
-				    its handler is being executed.  */
-# define SA_RESETHAND 0x80000000 /* Reset to SIG_DFL on entry to handler.  */
+#define SA_SIGINFO    4		 /* Invoke signal-catching function withthree arguments instead of one.  */
+#define SA_ONSTACK   0x08000000 /* Use signal stack by using `sa_restorer'. */
+#define SA_RESTART   0x10000000 /* Restart syscall on signal return.  */
+#define SA_INTERRUPT 0x20000000 /* Historical no-op.  */
+#define SA_NODEFER   0x40000000 /* Don't automatically block the signal when its handler is being executed.  */
+#define SA_RESTORER  0x04000000
+#define SA_RESETHAND 0x80000000 /* Reset to SIG_DFL on entry to handler.  */
 
 #define	SIG_BLOCK     0		 /* Block signals.  */
 #define	SIG_UNBLOCK   1		 /* Unblock signals.  */
 #define	SIG_SETMASK   2		 /* Set the set of blocked signals.  */
+
+#define SIG_DFL	((sighandler_t)0)	/* default signal handling */
+#define SIG_IGN	((sighandler_t)1)	/* ignore signal */
+#define SIG_ERR	((sighandler_t)-1)	/* error return from signal */
 
 struct timespec {
 	long	tv_sec;		/* seconds */
@@ -172,12 +175,17 @@ struct timezone {
 	int	tz_dsttime;	/* type of DST correction */
 };
 
-struct sigaction{
-	void (*sa_handler)(int);
-	// void (*sa_sigaction)(int, siginfo_t *, void *);
-	sigset_t sa_mask;
-	int sa_flags;
-	void (*sa_restorer)(void);
+//# define __user		__attribute__((noderef, address_space(1)))
+typedef void __signalfn_t(int);
+typedef __signalfn_t *__sighandler_t;
+typedef void __restorefn_t(void);
+typedef __restorefn_t *__sigrestore_t;
+
+struct sigaction {
+	__sighandler_t sa_handler;
+	unsigned long sa_flags;
+	__sigrestore_t sa_restorer;
+	sigset_t sa_mask;		/* mask last for extensibility */
 };
 
 /* system calls */
@@ -216,6 +224,8 @@ long sys_geteuid();
 long sys_getegid();
 
 // HW
+void sys_rt_sigreturn();
+long sys_rt_sigaction(int sig,const struct sigaction *act,struct sigaction *oact,size_t sigsetsize);
 long sys_rt_sigpending(sigset_t *set,size_t sigsetsize);
 long sys_rt_sigprocmask(int how,sigset_t *nset,sigset_t *oset,size_t sigsetsize);
 long sys_alarm(unsigned int seconds);
@@ -261,7 +271,7 @@ void perror(const char *prefix);
 unsigned int sleep(unsigned int s);
 
 // HW
-//int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
 int sigismember(const sigset_t *set, int sig);
 int sigaddset (sigset_t *set, int sig);
 int sigdelset (sigset_t *set, int sig);
@@ -269,7 +279,7 @@ int sigemptyset(sigset_t *set);
 int sigfillset(sigset_t *set);
 int sigpending(sigset_t *set);
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
-//sighandler_t signal(int signum, sighandler_t handler);
+sighandler_t signal(int signum, sighandler_t handler);
 //int setjmp(jmp_buf env);
 //void longjmp(jmp_buf env, int val);
 unsigned int alarm(unsigned int seconds);

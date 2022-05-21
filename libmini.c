@@ -232,6 +232,11 @@ void perror(const char *prefix) {
 	return;
 }
 
+void __myrt(){
+	// Implementation of the __myrt function is simply making a system call to sigreturn (rax = 15)
+	unsigned long __unused =0;
+	sys_rt_sigreturn(__unused);
+}
 int sigismember(const sigset_t *set, int sig){
 	sig -=1; // sig need to shift one bit
 	unsigned long checker = (1<<sig);
@@ -282,9 +287,9 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset){
 	WRAPPER_RETval(int);
 }
 
-/*
 sighandler_t signal(int signum, sighandler_t handler){
-	struct sigaction act, oact;
+	struct sigaction act={}; 
+	struct sigaction oact={};
 	act.sa_handler = handler;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags =0;
@@ -304,17 +309,15 @@ sighandler_t signal(int signum, sighandler_t handler){
 		return(oact.sa_handler);
 	}
 }
-*/
 
-/*
 int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact){
-	// ...
-	act->sa_flags |= SA_RESTORER;
-	act->sa_restorer = ; //your customized restore routine, e.g., __myrt 
-	ret = sys_rt_sigaction(signum, act, oldact, sizeof(sigset_t));
-	// ...
+	struct sigaction *new_act = act;
+	new_act->sa_flags |= SA_RESTORER;
+	new_act->sa_restorer = sys_rt_sigreturn; //your customized restore routine, e.g., __myrt 
+	long ret = sys_rt_sigaction(signum, new_act, oldact, sizeof(sigset_t));
+	WRAPPER_RETval(int);
 }
-*/
+
 unsigned int alarm(unsigned int seconds){
 	long ret = sys_alarm(seconds);
 	WRAPPER_RETval(unsigned int);
