@@ -134,14 +134,20 @@ setjmp:
 	mov [rdi+8], rcx 	; jb->reg[1] = RSP
 	mov rcx, [rbp]		; rcx = original RBP address
 	mov [rdi+16], rcx 	; jb->reg[2] = RBP
-	pop rcx
 	mov [rdi+24], r12 	; jb->reg[3] = R12
 	mov [rdi+32], r13 	; jb->reg[4] = R13
 	mov [rdi+40], r14 	; jb->reg[5] = R14
 	mov [rdi+48], r15 	; jb->reg[6] = R15
-
+	
+	mov rcx, rbp		; rcx = rbp = base frame
+	add rcx, 8			; rcx = original rtn address mem addr
+	mov rax, [rcx]		; rax = true rtn address
+	mov [rdi+56], rax	; jb->reg[7] = rtn addr
+	pop rcx
+	mov rax, 0			; setjmp return 0
 	leave
 	ret
 
-	global longjump:function
-longjump:
+	global longjmp:function
+longjmp:
+	ret
