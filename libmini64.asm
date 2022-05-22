@@ -188,7 +188,27 @@ longjmp:
 	mov rax, [rdi+16]	
 	mov rbp, rax		; rbp = rax
 
-	; magic is happening
+	; use rax to store address of mask
+	mov rax, rdi		; rax = rdi = &jb
+	add rax, 64			; rax = rdi+64 = &mask
+
+	; restore sigset via syscall sys_rt_sigprocmask with how = SIG_SETMASK
+	push rdi
+	push rsi
+	push rdx
+	push rcx
+
+	mov rdi, 0x2	; setting arguments -> how = SIG_SETMASK
+	mov rsi, rax	; setting arguments -> nset = &mask
+	mov rdx, 0x0	; setting arguments -> oldset = NULL
+	mov rcx, 0x8	; setting arguments -> sizeof(sigsize_t)
+	call	sys_rt_sigprocmask
+	pop rcx
+	pop rdx
+	pop rsi
+	pop rdi
+
+	; magic is happening to restore resp & rtn addr
 	mov rax, [rdi+8]	; rax is rsp original address
 	sub rax, 8			; rax -=8 as if it calls a function
 	mov rsp, rax		; set rsp = rax 
