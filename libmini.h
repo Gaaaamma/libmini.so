@@ -188,6 +188,11 @@ struct sigaction {
 	sigset_t sa_mask;		/* mask last for extensibility */
 };
 
+typedef struct jmp_buf_s {
+	long long reg[8];
+	sigset_t mask;
+} jmp_buf[1];
+
 /* system calls */
 long sys_read(int fd, char *buf, size_t count);
 long sys_write(int fd, const void *buf, size_t count);
@@ -280,8 +285,8 @@ int sigfillset(sigset_t *set);
 int sigpending(sigset_t *set);
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 sighandler_t signal(int signum, sighandler_t handler);
-//int setjmp(jmp_buf env);
-//void longjmp(jmp_buf env, int val);
+int setjmp(jmp_buf env);
+void longjmp(jmp_buf env, int val);
 unsigned int alarm(unsigned int seconds);
 
 #endif	/* __LIBMINI_H__ */
