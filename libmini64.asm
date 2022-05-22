@@ -150,4 +150,29 @@ setjmp:
 
 	global longjmp:function
 longjmp:
+	; reset reg (use rax as tmp)
+	mov rax, [rdi]		; rax = *rdi
+	mov rbx, rax		; rbx = rax
+
+	mov rax, [rdi+24]	
+	mov r12, rax		; r12 = rax
+	mov rax, [rdi+32]	
+	mov r13, rax		; r13 = rax
+	mov rax, [rdi+40]	
+	mov r14, rax		; r14 = rax
+	mov rax, [rdi+48]	
+	mov r15, rax		; r15 = rax
+
+	mov rax, [rdi+16]	
+	mov rbp, rax		; rbp = rax
+
+	; magic is happening
+	mov rax, [rdi+8]	; rax is rsp original address
+	sub rax, 8			; rax -=8 as if it calls a function
+	mov rsp, rax		; set rsp = rax 
+
+	mov rax, [rdi+56] 	; setting return address to rax
+	mov [rsp], rax		; [rsp] = rax
+
+	mov rax, rsi ; set return value
 	ret
