@@ -16,6 +16,16 @@ extern	errno
 
 	section .data
 
+jmpregRBX:	dq	0x0
+jmpregRSP:	dq	0x0
+jmpregRBP:	dq	0x0
+jmpregR12:	dq	0x0
+jmpregR13:	dq	0x0
+jmpregR14:	dq	0x0
+jmpregR15:	dq	0x0
+jmpregRET:	dq	0x0
+sigMASK:	dq	0x0
+
 	section .text
 
 	gensys   0, read
@@ -111,3 +121,27 @@ sys_rt_sigreturn:
 	syscall
 	ret 
 
+	global setjmp:function
+setjmp:
+	push rbp
+	mov rbp, rsp 	;record the base
+	; start to record REG
+	mov [rdi], rbx 		; jb->reg[0] = RBX
+	; use RCX as temp
+	push rcx
+	mov rcx, rbp		; rcx = rbp = base frame
+	add rcx, 16			; rcx = original RSP address
+	mov [rdi+8], rcx 	; jb->reg[1] = RSP
+	mov rcx, [rbp]		; rcx = original RBP address
+	mov [rdi+16], rcx 	; jb->reg[2] = RBP
+	pop rcx
+	mov [rdi+24], r12 	; jb->reg[3] = R12
+	mov [rdi+32], r13 	; jb->reg[4] = R13
+	mov [rdi+40], r14 	; jb->reg[5] = R14
+	mov [rdi+48], r15 	; jb->reg[6] = R15
+
+	leave
+	ret
+
+	global longjump:function
+longjump:
