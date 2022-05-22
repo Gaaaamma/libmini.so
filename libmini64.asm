@@ -144,6 +144,28 @@ setjmp:
 	mov rax, [rcx]		; rax = true rtn address
 	mov [rdi+56], rax	; jb->reg[7] = rtn addr
 	pop rcx
+
+	; use rax to store address of mask
+	mov rax, rdi		; rax = rdi = &jb
+	add rax, 64			; rax = rdi+64 = &mask
+
+	; ready to get mask via sigprocmask
+	push rdi
+	push rsi
+	push rdx
+	push rcx
+
+	mov rdi, 0x1	; setting arguments -> how = UNBLOCK
+	mov rsi, 0x0	; setting arguments -> nset = 0 = NULL
+	mov rdx, rax	; setting arguments -> oldset
+	mov rcx, 0x8	; setting arguments -> sizeof(sigsize_t)
+	call	sys_rt_sigprocmask
+	pop rcx
+	pop rdx
+	pop rsi
+	pop rdi
+
+
 	mov rax, 0			; setjmp return 0
 	leave
 	ret
