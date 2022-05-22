@@ -4,6 +4,13 @@
 Advanced Programming in the UNIX Environment<br>
 Due: May 20, 2022<br>
 
+## Result Overview
+### Use gdb-peda to monitor the procedure of assembly & syscall
+<img width="670" alt="截圖 2022-05-22 下午10 28 49" src="https://user-images.githubusercontent.com/84212529/169700375-c63260ab-1fef-4150-b9d1-4889a2012df8.png">
+
+### output
+<img width="587" alt="截圖 2022-05-22 下午10 27 24" src="https://user-images.githubusercontent.com/84212529/169700332-ae0e3e8d-432c-4864-a411-15772aecceda.png">
+
 ## Extend the Mini Lib C to Handle Signals
 In this homework, you have to extend the mini C library introduced in the class to support signal relevant system calls. You have to implement the following C library functions in Assembly and C using the syntax supported by yasm x86_64 assembler.
 
